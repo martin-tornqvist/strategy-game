@@ -1,0 +1,16 @@
+target/
+obj/
+test/bin
+test/obj
+*.o
+*~
+\#*
+*.patch
+CppCheckResults.xml
+*.mk
+*.pyc
+
+# Emacs gtags
+GPATH
+GRTAGS
+GTAGS
