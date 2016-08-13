@@ -1,0 +1,4 @@
+-std=c++11
+-I/usr/include/SDL2
+-Iinclude
+-Irl_utils/include
