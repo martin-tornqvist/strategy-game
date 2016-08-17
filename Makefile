@@ -18,12 +18,18 @@
 # Directories
 ###############################################################################
 EXE_BASE_NAME           = strategy_game
+
 COMMON_SRC_DIR          = src
 INC_DIR                 = include
 RES_DIR                 = res
+
 RL_UTILS_DIR            = rl_utils
 RL_UTILS_SRC_DIR        = $(RL_UTILS_DIR)/src
 RL_UTILS_INC_DIR        = $(RL_UTILS_DIR)/include
+
+JSON_FRAMEWORK_DIR      = json/2.0.2
+JSON_FRAMEWORK_INC_DIR  = $(JSON_FRAMEWORK_DIR)/include
+
 TEST_DIR                = test
 TEST_SRC_DIR            = $(TEST_DIR)/src
 TEST_FRAMEWORK_DIR      = $(TEST_DIR)/unittest++-1.6.1-x86_64
@@ -81,6 +87,7 @@ SDL_MIXER_BIN_DIR       = $(SDL_MIXER_DIR)/$(SDL_ARCH)/bin
 INCLUDES = \
   -I $(INC_DIR) \
   -I $(RL_UTILS_INC_DIR) \
+  -I $(JSON_FRAMEWORK_INC_DIR) \
   #
 
 # Compiler flags
@@ -92,7 +99,7 @@ INCLUDES = \
 #   suppressed as long as that implementation is used (should use the now
 #   standard C++ implementation instead though).
 CXXFLAGS += \
-  -std=c++11 \
+  -std=c++14 \
   -Wall \
   -Wextra \
   -Werror \
@@ -121,9 +128,9 @@ release: CXXFLAGS += \
   #
 
 # NOTE: The test target must use exceptions (used by the test framework)
-release debug: CXXFLAGS += \
-  -fno-exceptions \
-  #
+# release debug: CXXFLAGS += \
+#   -fno-exceptions \
+#  #
 
 debug test: CXXFLAGS += \
   -O0 \

@@ -1,6 +1,5 @@
 #include "io.hpp"
 #include "rl_utils.hpp"
-
 #include "game.hpp"
 
 #ifdef _WIN32
@@ -13,14 +12,15 @@ int main(int argc, char* argv[])
 
     TRACE_FUNC_BEGIN;
 
-    // Init IO
+    // Init
     io::init();
-    io::clear_scr();
+    game::init();
 
     // Run game session until done
-    game::run_session();
+    game::run();
 
-    // Cleanup IO
+    // Cleanup
+    game::cleanup();
     io::cleanup();
 
     TRACE_FUNC_END;

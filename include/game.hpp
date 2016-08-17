@@ -4,7 +4,13 @@
 namespace game
 {
 
-void run_session();
+void init();
+
+void cleanup();
+
+void run();
+
+void quit();
 
 } // game
 
