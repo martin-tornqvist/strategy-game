@@ -19,6 +19,9 @@
 ###############################################################################
 EXE_BASE_NAME           = strategy_game
 
+MAKEFILE_PATH           := $(abspath $(lastword $(MAKEFILE_LIST)))
+PROJECT_PATH            := $(patsubst %/,%,$(dir $(MAKEFILE_PATH)))
+
 COMMON_SRC_DIR          = src
 INC_DIR                 = include
 RES_DIR                 = res
@@ -127,11 +130,6 @@ release: CXXFLAGS += \
   -DNDEBUG \
   #
 
-# NOTE: The test target must use exceptions (used by the test framework)
-# release debug: CXXFLAGS += \
-#   -fno-exceptions \
-#  #
-
 debug test: CXXFLAGS += \
   -O0 \
   -g \
@@ -172,7 +170,6 @@ windows-cross-compile-release: INCLUDES += \
   #
 
 windows-cross-compile-release: CXXFLAGS += \
-  -fno-exceptions \
   -O2 \
   -DNDEBUG \
   #
@@ -213,7 +210,6 @@ osx-release osx-debug: LD_FLAGS = \
   #
 
 osx-release osx-debug: CXXFLAGS += \
-  -fno-exceptions \
   -DMACOSX \
   #
 
@@ -260,14 +256,23 @@ COMMON_OBJECTS_NO_MAIN  = $(COMMON_SRC_NO_MAIN:$(COMMON_SRC_DIR)%.cpp=$(OBJ_DIR)
 ###############################################################################
 all: release
 
-release debug: $(LINUX_EXE)
+release: $(LINUX_EXE)
+	cp -r $(RES_DIR)/* $(TARGET_DIR)
+
+# The debug target uses a symbolic link to the origin scripts instead of copying
+debug: $(LINUX_EXE)
+	cp -r $(RES_DIR)/fonts $(TARGET_DIR)
+	cd $(TARGET_DIR) && \
+	rm -rf scripts && \
+	ln -s $(PROJECT_PATH)/$(RES_DIR)/scripts
 
 test: $(LINUX_TEST_EXE)
 	@echo "Running tests..."; \
 	cd $(TARGET_DIR) && ./$(LINUX_TEST_EXE_NAME)
 
-# The Windows version needs to copy some DLLs and licenses
+# The Windows version also needs to copy some DLLs and licenses
 windows-cross-compile-release: $(WINDOWS_EXE)
+	cp -r $(RES_DIR)/* $(TARGET_DIR)
 	cp \
 	  $(SDL_BIN_DIR)/SDL2.dll \
 	  $(SDL_IMAGE_BIN_DIR)/SDL2_image.dll \
@@ -284,11 +289,10 @@ windows-cross-compile-release: $(WINDOWS_EXE)
 
 osx-release osx-debug: $(LINUX_EXE)
 
-# Generic recipe for linking an executable and copying the resource directory
-define link-exe-and-copy-res
-  mkdir -p $(TARGET_DIR)
+# Generic recipe for linking the executable
+define link-exe
+  @mkdir -p $(TARGET_DIR)
   $(CXX) $^ -o $@ $(LD_FLAGS)
-  cp -r $(RES_DIR)/* $(TARGET_DIR)
 endef
 
 # Generic recipe for compiling an object file
@@ -298,10 +302,10 @@ define compile-object
 endef
 
 $(LINUX_EXE) $(WINDOWS_EXE): $(COMMON_OBJECTS) $(RL_UTILS_OBJECTS)
-	$(link-exe-and-copy-res)
+	$(link-exe)
 
 $(LINUX_TEST_EXE): $(COMMON_OBJECTS_NO_MAIN) $(RL_UTILS_OBJECTS) $(TEST_OBJECTS)
-	$(link-exe-and-copy-res)
+	$(link-exe)
 
 # Compiling common objects
 $(OBJ_DIR)/%.o: $(COMMON_SRC_DIR)/%.cpp

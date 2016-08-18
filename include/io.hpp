@@ -16,6 +16,27 @@ struct RenderData
     Clr clr_bg;
 };
 
+enum class MouseBtn
+{
+    none,
+    left,
+    right
+};
+
+struct InputData
+{
+    InputData() :
+        key         (-1),
+        mouse_px_p  (),
+        mouse_btn   (MouseBtn::none) {}
+
+    int key;
+
+    P mouse_px_p;
+
+    MouseBtn mouse_btn;
+};
+
 namespace io
 {
 
@@ -43,7 +64,7 @@ void draw_rect(const P& p,
 
 void sleep(const unsigned int ms);
 
-void read_input();
+InputData get_input();
 
 } // io
 

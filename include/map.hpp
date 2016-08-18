@@ -11,6 +11,8 @@ class MapTer;
 namespace map
 {
 
+extern P map_dims;
+
 extern Array2< std::unique_ptr<MapTer> > ter;
 
 void init();

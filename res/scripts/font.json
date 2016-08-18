@@ -1,0 +1,7 @@
+{
+    "font_name"     : "curses_8x16.png",
+    "image_width"   : 256,
+    "image_height"  : 128,
+    "char_width"    : 8,
+    "char_height"   : 16
+}

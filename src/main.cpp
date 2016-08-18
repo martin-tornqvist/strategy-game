@@ -1,6 +1,7 @@
 #include "io.hpp"
 #include "rl_utils.hpp"
-#include "game.hpp"
+#include "state.hpp"
+#include "map.hpp"
 
 #ifdef _WIN32
 #undef main
@@ -14,13 +15,30 @@ int main(int argc, char* argv[])
 
     // Init
     io::init();
-    game::init();
+    states::init();
+    map::init();
 
-    // Run game session until done
-    game::run();
+    std::unique_ptr<State> main_menu_state(new MainMenuState);
+
+    states::push_state(std::move(main_menu_state));
+
+    // Loop while there is at least one state
+    while (!states::is_empty())
+    {
+        io::clear_scr();
+
+        states::render();
+
+        io::update_screen();
+
+        InputData input = io::get_input();
+
+        states::handle_input(input);
+    }
 
     // Cleanup
-    game::cleanup();
+    map::cleanup();
+    states::cleanup();
     io::cleanup();
 
     TRACE_FUNC_END;

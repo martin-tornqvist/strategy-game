@@ -1,23 +1,53 @@
 #include "map.hpp"
 
+#include <fstream>
+
 #include "map_ter.hpp"
+#include "json.hpp"
 
 namespace map
 {
 
+P map_dims;
+
 Array2< std::unique_ptr<MapTer> > ter;
+
+namespace
+{
+
+void load_script_data()
+{
+    TRACE_FUNC_BEGIN;
+
+    std::ifstream ifs("scripts/map.json");
+
+    nlohmann::json j(ifs);
+
+    map_dims.x = j["map_width"];
+    map_dims.y = j["map_height"];
+
+    TRACE_FUNC_END;
+}
+
+} // namespace
 
 void init()
 {
-    ter.resize(map_w, map_h);
+    TRACE_FUNC_BEGIN;
 
-    for (int x = 0; x < map_w; ++x)
+    load_script_data();
+
+    ter.resize(map_dims.x, map_dims.y);
+
+    for (int x = 0; x < map_dims.x; ++x)
     {
-        for (int y = 0; y < map_h; ++y)
+        for (int y = 0; y < map_dims.y; ++y)
         {
             map::ter(x, y).reset(new MapTer(P(x, y)));
         }
     }
+
+    TRACE_FUNC_END;
 }
 
 void cleanup()
@@ -39,10 +69,6 @@ void draw()
                           d.clr_bg);
         }
     });
-
-    io::draw_char(ter(0, 0)->p().x + '0',
-                  P(15, 15),
-                  clr_magenta);
 }
 
 } // map
