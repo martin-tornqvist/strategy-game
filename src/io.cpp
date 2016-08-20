@@ -2,10 +2,9 @@
 
 #include <SDL.h>
 #include <SDL_image.h>
-#include <fstream>
 
 #include "global.hpp"
-#include "json.hpp"
+#include "script.hpp"
 
 namespace io
 {
@@ -40,24 +39,15 @@ void load_script_data()
 {
     TRACE_FUNC_BEGIN;
 
-    std::ifstream ifs("scripts/font.json");
+    auto j = script::read("font.json");
 
-    nlohmann::json j(ifs);
+    font_name       = script::get_str("font_name", j);
+    font_img_px_d_  = script::get_p("image_width", "image_height", j);
+    cell_px_d_      = script::get_p("char_width", "char_height", j);
 
-    font_name           = j["font_name"];
-    font_img_px_d_.x    = j["image_width"];
-    font_img_px_d_.y    = j["image_height"];
-    cell_px_d_.x        = j["char_width"];
-    cell_px_d_.y        = j["char_height"];
+    j = script::read("render.json");
 
-    // TODO: How to open and read another json file using the same ifstream and
-    //       json object?
-    std::ifstream ifs2("scripts/render.json");
-
-    nlohmann::json j2(ifs2);
-
-    scr_d_.x            = j2["screen_width"];
-    scr_d_.y            = j2["screen_height"];
+    scr_d_ = script::get_p("screen_width", "screen_height", j);
 
     TRACE_FUNC_END;
 }
@@ -139,10 +129,10 @@ void load_font_data()
     TRACE_FUNC_END;
 }
 
-P get_glyph_pos(const char glyph)
+P get_glyph_pos(const char c)
 {
-    return P(glyph % font_w_,
-             glyph / font_w_);
+    return P(c % font_w_,
+             c / font_w_);
 }
 
 void put_glyph_pxs_on_screen(const char glyph,
@@ -305,14 +295,25 @@ void draw_text(const std::string& str,
 
     P px_pos(p * cell_px_d_);
 
-    for (const char glyph : str)
+    for (auto it = begin(str); it != end(str); ++it)
     {
         if (px_pos.x < 0 || px_pos.x >= scr_px_d_.x)
         {
             return;
         }
 
-        draw_glyph_at_px(glyph,
+        const char c = *it;
+
+        // Format character?
+        if (c == '\n')
+        {
+            px_pos.x     = p.x * cell_px_d_.x;
+            px_pos.y    += cell_px_d_.y;
+
+            continue;
+        }
+
+        draw_glyph_at_px(c,
                          px_pos,
                          clr,
                          bg_clr);
@@ -487,6 +488,14 @@ InputData get_input()
     } // while
 
     return d;
+}
+
+void flush_input()
+{
+    while (SDL_PollEvent(&sdl_event_))
+    {
+        // Do nothing
+    }
 }
 
 } // io

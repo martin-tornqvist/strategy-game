@@ -25,34 +25,6 @@ public:
     virtual void on_popped() {}
 };
 
-class MainMenuState : public State
-{
-public:
-    MainMenuState() {}
-
-    ~MainMenuState() {}
-
-    void render() const override;
-
-    void on_input(const InputData& input) override;
-
-    void on_pushed() override;
-};
-
-class MapState : public State
-{
-public:
-    MapState() {}
-
-    ~MapState() {}
-
-    void render() const override;
-
-    void on_input(const InputData& input) override;
-
-    void on_pushed() override;
-};
-
 namespace states
 {
 

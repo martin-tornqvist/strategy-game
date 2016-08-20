@@ -1,9 +1,7 @@
 #include "map.hpp"
 
-#include <fstream>
-
 #include "map_ter.hpp"
-#include "json.hpp"
+#include "script.hpp"
 
 namespace map
 {
@@ -19,12 +17,9 @@ void load_script_data()
 {
     TRACE_FUNC_BEGIN;
 
-    std::ifstream ifs("scripts/map.json");
+    auto j = script::read("map.json");
 
-    nlohmann::json j(ifs);
-
-    map_dims.x = j["map_width"];
-    map_dims.y = j["map_height"];
+    map_dims = script::get_p("width", "height", j);
 
     TRACE_FUNC_END;
 }
@@ -38,14 +33,6 @@ void init()
     load_script_data();
 
     ter.resize(map_dims.x, map_dims.y);
-
-    for (int x = 0; x < map_dims.x; ++x)
-    {
-        for (int y = 0; y < map_dims.y; ++y)
-        {
-            map::ter(x, y).reset(new MapTer(P(x, y)));
-        }
-    }
 
     TRACE_FUNC_END;
 }
@@ -63,7 +50,7 @@ void draw()
         {
             const auto& d = ter->render_data();
 
-            io::draw_char(d.glyph,
+            io::draw_char(d.symbol,
                           ter->p(),
                           d.clr,
                           d.clr_bg);

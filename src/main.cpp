@@ -1,7 +1,8 @@
 #include "io.hpp"
 #include "rl_utils.hpp"
-#include "state.hpp"
+#include "main_menu_state.hpp"
 #include "map.hpp"
+#include "map_ter.hpp"
 
 #ifdef _WIN32
 #undef main
@@ -17,6 +18,7 @@ int main(int argc, char* argv[])
     io::init();
     states::init();
     map::init();
+    ter_data::init();
 
     std::unique_ptr<State> main_menu_state(new MainMenuState);
 
@@ -37,6 +39,7 @@ int main(int argc, char* argv[])
     }
 
     // Cleanup
+    ter_data::cleanup();
     map::cleanup();
     states::cleanup();
     io::cleanup();

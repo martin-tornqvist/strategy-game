@@ -2,62 +2,6 @@
 
 #include "io.hpp"
 
-//-----------------------------------------------------------------------------
-// State implementations
-//-----------------------------------------------------------------------------
-void MainMenuState::render() const
-{
-    io::draw_text("This is the main menu",
-                  P(0, 0),
-                  clr_white,
-                  clr_black);
-}
-
-void MainMenuState::on_input(const InputData& input)
-{
-    switch (input.key)
-    {
-    case 'n':
-    {
-        std::unique_ptr<State> map_state(new MapState);
-
-        states::push_state(std::move(map_state));
-    }
-    break;
-
-    case 'q':
-    {
-        states::pop_state();
-    }
-    break;
-    }
-}
-
-void MainMenuState::on_pushed()
-{
-
-}
-
-void MapState::render() const
-{
-    io::draw_text("This is the map",
-                  P(1, 1),
-                  clr_green_lgt,
-                  clr_black);
-}
-
-void MapState::on_input(const InputData& input)
-{
-    if (input.key == 'b')
-    {
-        states::pop_state();
-    }
-}
-
-void MapState::on_pushed()
-{
-
-}
 
 //-----------------------------------------------------------------------------
 // State keeping
@@ -113,6 +57,8 @@ void push_state(std::unique_ptr<State> state)
     states_.push_back(std::move(state));
     states_.back()->on_pushed();
 
+    io::flush_input();
+
     TRACE_FUNC_END;
 }
 
@@ -125,6 +71,8 @@ void pop_state()
         states_.back()->on_popped();
         states_.pop_back();
     }
+
+    io::flush_input();
 
     TRACE_FUNC_END;
 }

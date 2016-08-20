@@ -7,11 +7,11 @@
 struct RenderData
 {
     RenderData() :
-        glyph   (0),
-        clr     (clr_white),
+        symbol  ('?'),
+        clr     (clr_magenta_lgt),
         clr_bg  (clr_black) {}
 
-    char glyph;
+    char symbol;
     Clr clr;
     Clr clr_bg;
 };
@@ -53,7 +53,7 @@ void draw_text(const std::string& str,
                const Clr& clr,
                const Clr& bg_clr = clr_black);
 
-void draw_char(const char glyph,
+void draw_char(const char symbol,
                const P& p,
                const Clr& clr,
                const Clr& bg_clr = clr_black);
@@ -65,6 +65,8 @@ void draw_rect(const P& p,
 void sleep(const unsigned int ms);
 
 InputData get_input();
+
+void flush_input();
 
 } // io
 
